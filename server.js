@@ -10,7 +10,14 @@ const app = express();
 
 // Middleware
 
-app.use(cors({ origin: "*" })); // Allow all origins
+const cors = require("cors");
+app.use(
+  cors({
+    origin: "*", // Allow all origins temporarily for testing
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true, // If cookies or authentication are involved
+  })
+);
 
 app.use(bodyParser.json());
 app.use("/uploads", express.static("uploads"));
