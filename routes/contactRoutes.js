@@ -1,6 +1,6 @@
 const express = require("express");
 const multer = require("multer");
-const Contact = require("../models/Contact");
+const Contact = require("../models/contact");
 const router = express.Router();
 
 // Multer setup for image uploads
