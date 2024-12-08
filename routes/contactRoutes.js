@@ -13,29 +13,16 @@ const upload = multer({ storage });
 // Create Contact
 router.post("/", upload.single("photo"), async (req, res) => {
   try {
-    console.log("Request body:", req.body);
-    console.log("Uploaded file:", req.file);
-
-    const { name, phone, email, address, coordinates } = req.body;
-    if (!name || !phone || !email || !address || !coordinates) {
-      console.log("Missing fields:", {
-        name,
-        phone,
-        email,
-        address,
-        coordinates,
-      });
-      return res
-        .status(400)
-        .json({ error: "All fields, including coordinates, are required." });
+    if (!req.body.name || !req.body.phone || !req.body.email) {
+      return res.status(400).json({ error: "Missing required fields" });
     }
 
     const newContact = new Contact({
-      name,
-      phone,
-      email,
-      address,
-      coordinates,
+      name: req.body.name,
+      phone: req.body.phone,
+      email: req.body.email,
+      address: req.body.address,
+      coordinates: req.body.coordinates,
       photo: req.file?.path || null,
     });
 
@@ -45,7 +32,7 @@ router.post("/", upload.single("photo"), async (req, res) => {
       .json({ message: "Contact created successfully!", contact: newContact });
   } catch (error) {
     console.error("Error creating contact:", error.message);
-    res.status(500).json({ error: "Failed to create contact." });
+    res.status(500).json({ error: "Server error. Please try again." });
   }
 });
 
