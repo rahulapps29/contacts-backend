@@ -5,11 +5,8 @@ const contactSchema = new mongoose.Schema({
   phone: { type: String, required: true },
   email: { type: String, required: true },
   address: { type: String, required: true },
-  coordinates: {
-    latitude: { type: Number, required: true },
-    longitude: { type: Number, required: true },
-  },
-  photo: { type: String },
+  coordinates: { type: String }, // Store as a string: "latitude,longitude"
+  photo: { type: String }, // Path to the uploaded photo
 });
 
 module.exports = mongoose.model("Contact", contactSchema);

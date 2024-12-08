@@ -1,6 +1,6 @@
 const express = require("express");
 const multer = require("multer");
-const Contact = require("../models/Contact");
+const Contact = require("../models/contact");
 const router = express.Router();
 
 // Multer setup for image uploads
@@ -13,21 +13,30 @@ const upload = multer({ storage });
 // Create Contact
 router.post("/", upload.single("photo"), async (req, res) => {
   try {
-    const { name, phone, email, address, latitude, longitude } = req.body;
+    const { name, phone, email, address, coordinates } = req.body;
+
+    if (!name || !phone || !email || !address || !coordinates) {
+      return res
+        .status(400)
+        .json({ error: "All fields, including coordinates, are required." });
+    }
+
     const newContact = new Contact({
       name,
       phone,
       email,
       address,
-      coordinates: { latitude, longitude },
+      coordinates, // Directly use the single field: "latitude,longitude"
       photo: req.file?.path,
     });
+
     await newContact.save();
     res
       .status(201)
-      .json({ message: "Contact saved successfully!", contact: newContact });
+      .json({ message: "Contact created successfully!", contact: newContact });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error creating contact:", error.message);
+    res.status(500).json({ error: "Failed to create contact." });
   }
 });
 
@@ -53,23 +62,37 @@ router.delete("/:id", async (req, res) => {
 });
 
 // Update Contact
-router.put("/:id", async (req, res) => {
+router.put("/:id", upload.single("photo"), async (req, res) => {
   try {
-    const updatedContact = await Contact.findByIdAndUpdate(
+    const { name, phone, email, address, coordinates } = req.body;
+
+    const updatedContact = {
+      name,
+      phone,
+      email,
+      address,
+      coordinates, // Update the combined field
+    };
+
+    // Add photo only if a new file is uploaded
+    if (req.file) {
+      updatedContact.photo = req.file.path;
+    }
+
+    const contact = await Contact.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updatedContact,
       { new: true }
     );
-    if (!updatedContact)
+
+    if (!contact) {
       return res.status(404).json({ error: "Contact not found" });
-    res
-      .status(200)
-      .json({
-        message: "Contact updated successfully",
-        contact: updatedContact,
-      });
+    }
+
+    res.status(200).json({ message: "Contact updated successfully!", contact });
   } catch (error) {
-    res.status(500).json({ error: "Failed to update contact" });
+    console.error("Error updating contact:", error.message);
+    res.status(500).json({ error: "Failed to update contact." });
   }
 });
 
