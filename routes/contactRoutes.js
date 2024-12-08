@@ -13,9 +13,10 @@ const upload = multer({ storage });
 // Create Contact
 router.post("/", upload.single("photo"), async (req, res) => {
   try {
-    const { name, phone, email, address, coordinates } = req.body;
+    console.log("Request body:", req.body);
+    console.log("Uploaded file:", req.file);
 
-    // Validate required fields
+    const { name, phone, email, address, coordinates } = req.body;
     if (!name || !phone || !email || !address || !coordinates) {
       console.log("Missing fields:", {
         name,
@@ -29,17 +30,13 @@ router.post("/", upload.single("photo"), async (req, res) => {
         .json({ error: "All fields, including coordinates, are required." });
     }
 
-    // Log the uploaded file
-    console.log("Uploaded file:", req.file);
-
-    // Create a new contact
     const newContact = new Contact({
       name,
       phone,
       email,
       address,
       coordinates,
-      photo: req.file?.path || null, // Use null if no file is uploaded
+      photo: req.file?.path || null,
     });
 
     await newContact.save();

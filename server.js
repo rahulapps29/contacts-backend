@@ -9,7 +9,9 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors());
+
+app.use(cors({ origin: "*" })); // Allow all origins
+
 app.use(bodyParser.json());
 app.use("/uploads", express.static("uploads"));
 
