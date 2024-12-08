@@ -15,19 +15,31 @@ router.post("/", upload.single("photo"), async (req, res) => {
   try {
     const { name, phone, email, address, coordinates } = req.body;
 
+    // Validate required fields
     if (!name || !phone || !email || !address || !coordinates) {
+      console.log("Missing fields:", {
+        name,
+        phone,
+        email,
+        address,
+        coordinates,
+      });
       return res
         .status(400)
         .json({ error: "All fields, including coordinates, are required." });
     }
 
+    // Log the uploaded file
+    console.log("Uploaded file:", req.file);
+
+    // Create a new contact
     const newContact = new Contact({
       name,
       phone,
       email,
       address,
-      coordinates, // Directly use the single field: "latitude,longitude"
-      photo: req.file?.path,
+      coordinates,
+      photo: req.file?.path || null, // Use null if no file is uploaded
     });
 
     await newContact.save();
