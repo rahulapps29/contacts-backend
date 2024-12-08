@@ -45,6 +45,7 @@ mongoose
     process.exit(1); // Exit process if database connection fails
   });
 
+console.log("abc");
 // Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
